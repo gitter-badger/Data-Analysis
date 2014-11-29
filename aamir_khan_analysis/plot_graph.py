@@ -22,16 +22,14 @@ def process_csv(pandas_csv_obj):
     return data_tuple_list
 
 def plot_graph(data_tuple_list):
-    d = pd.DataFrame(data_tuple_list, columns=["Year", "Count", "Hits"])
-    d.describe()
-    d.groupby("Year").plot(kind="bar")
-    #plt.show()
+    df = pd.DataFrame(data_tuple_list, columns=['Year', 'Count', 'Hits'])
+    df.set_index('Year', inplace=True)
+    df.plot(kind='bar')
+    plt.show()
     return
 
 def start():
     movie_file = read_csv()
     data_tuple_list = process_csv(movie_file)
+    #return data_tuple_list
     plot_graph(data_tuple_list)
-
-if __name__ == "__main__":
-    start()
