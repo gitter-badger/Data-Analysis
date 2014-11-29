@@ -6,10 +6,10 @@ from mongoengine import *
 connect("stack_overflow")
 
 QUESTION_URL =
-"https://api.stackexchange.com/2.2/questions?key=i1hKBRZQ2g6vI6SuZxKUzQ((page=%s&pagesize=100&fromdate=%s&todate=%s&order=desc&sort=creation&tagged=%s&site=stackoverflow"
+"https://api.stackexchange.com/2.2/questions?key=%spage=%s&pagesize=100&fromdate=%s&todate=%s&order=desc&sort=creation&tagged=%s&site=stackoverflow"
 
 ANSWER_URL =
-"https://api.stackexchange.com/2.2/questions/%s/answers?order=asc&sort=activity&site=stackoverflow&key=i1hKBRZQ2g6vI6SuZxKUzQ(("
+"https://api.stackexchange.com/2.2/questions/%s/answers?order=asc&sort=activity&site=stackoverflow&key=%s"
 
 def get_epoch_time_diff(start_date, num_of_days_to_negate):
     '''
@@ -29,14 +29,15 @@ class Answer(Document):
     answers = ListField(DictField())
 
 def get_command_arg():
-
+    pass
 
 class API(object):
-    def __init__(self, tag, start_date, end_date):
+    def __init__(self, tag, start_date, end_date, key):
         self.tag = tag
         self.start_date = start_date
         self.end_date = end_date
-
+        self.key = key
+    
     def insert_to_mongo(self, question_dict, answer_dict_list=None):
         '''
         Insert to mongo
@@ -67,7 +68,7 @@ class API(object):
         '''
         Call this method recursively until it gets all pages
         '''
-        question_url = QUESTION_URL%(page, self.start_date, self.end_date, self.tag)
+        question_url = QUESTION_URL%(self.key, page, self.start_date, self.end_date, self.tag)
         handle = requests.get(question_url)
         json_data = handle.json()
 
@@ -96,7 +97,7 @@ class API(object):
     def process_answer_data(self, question_id):
         '''
         '''
-        answer_url = ANSWER_URL%question_id
+        answer_url = ANSWER_URL%(question_id, self.key)
         handle = requests.get(answer_url)
         json_data = handle.json()
         records = json_data['items']
